@@ -1,5 +1,7 @@
 #include <iostream>
-
+#include <Windows.h>s
+// For Async Functions
+#include <conio.h>
 using namespace std;
 
 bool gameOver;
@@ -15,7 +17,7 @@ void Setup(){
 	dir = STOP;
 	// Snakes head will be centered on the map
 	x = width / 2;
-	y = width / 2;
+	y = height / 2;
 	// Fruit will be generated randomly on the map
 	fruitX = rand() % width;
 	fruitY = rand() % height;
@@ -37,7 +39,12 @@ void Draw(){
 			if (j == 0)
 				cout << "#";
 			
-			cout << " ";
+			if (i == y && j == x)
+				cout << "O";
+			else if (i == fruitY && j == fruitX)
+				cout << "X";
+			else
+				cout << " ";
 
 			if (j == width - 1)
 				cout << "#";
@@ -50,14 +57,62 @@ void Draw(){
 		cout << "#";
 	cout << endl;
 
+	// Display Score
+	cout << "Score: " << score << '\n';
+	cout << endl;
 }
 
 void Input(){
+	// Checks if keyboard is hit
+	if (_kbhit()) {
+		switch (_getch()) {
+		case 'a': 
+			dir = LEFT; 
+			break;  
+		case 'd': 
+			dir = RIGHT; 
+			break;
+		case 'w': 
+			dir = UP; 
+			break;
+		case 's': 
+			dir = DOWN; 
+			break;
+		case 'x': 
+			gameOver = true; 	
+			break;
 
+		}
+	}
 }
 
 void Logic(){
-
+	// Switch directions
+	switch (dir){
+	case LEFT:	
+		--x; 
+		break;
+	case RIGHT: 
+		++x; 
+		break;
+	case UP:	
+		--y; 
+		break;
+	case DOWN:	
+		++y; 
+		break;
+	default: break;
+	}
+	// Hit the sides and Game Over!!
+	if (x > width || x < 0 || y > height || y < 0)
+		gameOver = true;
+	// Eat the fruit to increase score
+	if (x == fruitX && y == fruitY) {
+		score += 1;
+		// Fruit will be generated randomly on the map
+		fruitX = rand() % width;
+		fruitY = rand() % height;		
+	}
 }
 
 int main() {
@@ -66,6 +121,6 @@ int main() {
 		Draw();
 		Input();
 		Logic();
-		//Sleep(10);
+		Sleep(30);
 	}
 }
