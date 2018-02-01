@@ -39,16 +39,19 @@ void Draw(){
 		cout << "#";
 	cout << endl;
 
-	// Create the map
+	// Drawing the snake 
 	for (int i = 0; i < height; ++i) {
+		// Side Wall
 		for (int j = 0; j < width; ++j) {
 			if (j == 0)
 				cout << "#";
-			
+			// Snake Head
 			if (i == y && j == x)
 				cout << "O";
+			// Fruit
 			else if (i == fruitY && j == fruitX)
 				cout << "X";
+			// Extending Snake's Tail
 			else {
 				bool print = false;
 				for (int k = 0; k < nTail; ++k) {
@@ -57,9 +60,10 @@ void Draw(){
 					}
 				}
 				if (!print)
-					cout << " ";
+					cout << " ";	
 			}
 
+			// Another Side Wall
 			if (j == width - 1)
 				cout << "#";
 		}
@@ -71,7 +75,7 @@ void Draw(){
 		cout << "#";
 	cout << endl;
 
-	// Display Scored
+	// Display Score
 	cout << "Score: " << score << '\n';
 	cout << endl;
 }
@@ -132,10 +136,24 @@ void Logic(){
 		break;
 	default: break;
 	}
-	// Hit the sides and Game Over!!
+	// Kill Logic
+	// Boundary
+	/*
 	if (x > width || x < 0 || y > height || y < 0)
 		gameOver = true;
-	// Eat the fruit to increase score
+	*/
+	// Cannibalism
+	for (int i = 0; i < nTail; ++i) {
+		if (tailX[i] == x && tailY[i] == y)
+			gameOver = true;
+	}
+
+	// Go through wall - Disable the Boundary Kill Logic
+	if (x >= width) x = 0; else if(x <= 0 ) x = width - 1;
+	if (y >= height) y = 0; else if (y <= 0) y = height - 1;
+
+
+	// Fruit Logic
 	if (x == fruitX && y == fruitY) {
 		// Increase the tail length and score by 1
 		nTail += 1;
