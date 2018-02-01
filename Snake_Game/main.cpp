@@ -2,13 +2,19 @@
 #include <Windows.h>s
 // For Async Functions
 #include <conio.h>
+#include <algorithm>
 using namespace std;
 
 bool gameOver;
+int speed = 30;
 // Screen Dimensions
 const int width = 40, height = 20;
 // Coordinates for Snake and Fruits
 int x, y, fruitX, fruitY, score;
+// Tail Coordinates
+int tailX[100], tailY[100];
+// Tail Length
+int nTail;
 // Direction of the Snake
 enum eDirection{STOP=0,LEFT,RIGHT,UP,DOWN};
 eDirection dir;
@@ -43,8 +49,16 @@ void Draw(){
 				cout << "O";
 			else if (i == fruitY && j == fruitX)
 				cout << "X";
-			else
-				cout << " ";
+			else {
+				bool print = false;
+				for (int k = 0; k < nTail; ++k) {
+					if (tailX[k] == j && tailY[k] == i) {
+						cout << "0"; print = true;
+					}
+				}
+				if (!print)
+					cout << " ";
+			}
 
 			if (j == width - 1)
 				cout << "#";
@@ -57,7 +71,7 @@ void Draw(){
 		cout << "#";
 	cout << endl;
 
-	// Display Score
+	// Display Scored
 	cout << "Score: " << score << '\n';
 	cout << endl;
 }
@@ -78,6 +92,13 @@ void Input(){
 		case 's': 
 			dir = DOWN; 
 			break;
+		// Added speed control
+		case '+':
+			speed -= 10;
+			break;
+		case '-':
+			speed += 10;
+			break;
 		case 'x': 
 			gameOver = true; 	
 			break;
@@ -87,6 +108,14 @@ void Input(){
 }
 
 void Logic(){
+
+	// Tail Logic
+	int prevX = tailX[0], prevY = tailY[0];
+	tailX[0] = x; tailY[0] = y;
+	for (int i = 1; i < nTail; ++i) {
+		swap(tailX[i], prevX);
+		swap(tailY[i], prevY);
+	}
 	// Switch directions
 	switch (dir){
 	case LEFT:	
@@ -108,11 +137,19 @@ void Logic(){
 		gameOver = true;
 	// Eat the fruit to increase score
 	if (x == fruitX && y == fruitY) {
+		// Increase the tail length and score by 1
+		nTail += 1;
 		score += 1;
 		// Fruit will be generated randomly on the map
 		fruitX = rand() % width;
 		fruitY = rand() % height;		
 	}
+
+	// Speed logic
+	if (speed > 300)
+		speed = 300;
+	else if (speed < 0)
+		speed = 0;
 }
 
 int main() {
@@ -121,6 +158,6 @@ int main() {
 		Draw();
 		Input();
 		Logic();
-		Sleep(30);
+		Sleep(speed);
 	}
 }
